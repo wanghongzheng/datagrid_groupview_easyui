@@ -1,0 +1,92 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="keywords" content="jquery,ui,easy,easyui,web">
+	<meta name="description" content="easyui help you build your web page easily!">
+	<title>Expand row in DataGrid to show subgrid - jQuery EasyUI Demo</title>
+	<link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="./demo.css">
+	<script type="text/javascript" src="../jquery.min.js"></script>
+	<script type="text/javascript" src="../jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="./datagrid_detailview.js"></script>
+</head>
+<body>
+	<h2>Expand row in DataGrid to show subgrid</h2>
+	<div class="demo-info" style="margin-bottom:10px">
+		<div class="demo-tip icon-tip"> </div>
+		<div>Click the expand button to expand row and view subgrid.</div>
+	</div>
+	
+	<div id="dg" style="width:650px;height:250px"></div>
+	<script type="text/javascript">
+		var datagird_data = {"total":28,"rows":[
+			{"company":"企业1","address":'天津',"companyCode":"EST-1"},
+			{"company":"企业2","address":'天津',"companyCode":"EST-2"},
+			{"company":"企业3","address":'天津',"companyCode":"EST-3"},
+			{"company":"企业4","address":'天津',"companyCode":"EST-5"},
+			{"company":"企业5","address":'天津',"companyCode":"EST-6"}
+
+		]};
+		var datagrid_detaildata = {"total":10,"rows":[
+			{"outfallCode":"p0001","outfallName":'排口1',"outfallType":"排水口"},
+			{"outfallCode":"p0002","outfallName":'排口2',"outfallType":"排水口"},
+			{"outfallCode":"p0003","outfallName":'排口3',"outfallType":"排水口"}
+		]};
+		
+		$(function(){
+			$('#dg').datagrid({
+				view: detailview,//detailview必须写
+				//url:"./getDatagird_data",//向后台请求数据
+				data: datagird_data,
+				singleSelect:"true" ,
+				fitColumns:"true",
+				striped:true,
+				checkOnSelect:'true',
+				columns:[[
+						{field:'companyCode',title:'企业编号',width:100},
+						{field:'company',title:'企业名称',width:100,align:'left'},
+						{field:'address',title:'企业地址',width:100,align:'left'}
+					]],
+				detailFormatter:function(index,row){
+					return '<div style="padding:2px"><table id="ddv-' + index + '"></table></div>';
+				},
+				onExpandRow: function(index,row){
+					$('#ddv-'+index).datagrid({
+						//url:'./getDatagrid_detaildata?companyCode='+row.companyCode,点击后再去后台请求数据
+						data:datagrid_detaildata,
+						fitColumns:true,
+						singleSelect:true,
+						rownumbers:true,
+						loadMsg:'',
+						height:'auto',
+						columns:[[
+							{field:'outfallCode',title:'排口编码',width:200},
+							{field:'outfallName',title:'排口名称',width:100,align:'left'},
+							{field:'outfallType',title:'排口类型',width:100,align:'left'},
+							{field:'op',title:'操作',width:100,align:'left',formatter:formatOper}
+						]],
+						onResize:function(){
+							$('#dg').datagrid('fixDetailRowHeight',index);
+						},
+						onLoadSuccess:function(){
+							$('#dg').datagrid("selectRow", index)
+							setTimeout(function(){
+								$('#dg').datagrid('fixDetailRowHeight',index);
+							},0);
+						}
+					});
+					$('#dg').datagrid('fixDetailRowHeight',index);
+				}
+			});
+		});
+		function formatOper(val,row,index){  
+		    return '<a onclick="editFunc()" href="javascript:void(0)">修改</a>';  
+		}  
+		function editFunc(){
+			alert("ddd");
+		}
+	</script>
+	
+</body>
+</html>
